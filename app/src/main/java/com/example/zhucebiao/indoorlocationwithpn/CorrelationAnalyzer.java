@@ -1,7 +1,9 @@
 package com.example.zhucebiao.indoorlocationwithpn;
 
+import android.support.annotation.NonNull;
+
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
 
 /**
@@ -17,8 +19,32 @@ public class CorrelationAnalyzer {
     static final private int gap = 48000 / 1000 * 400; //minimum gap between two signals 400ms
 
     private int[] result;
-    private Queue<Integer> start;//start index
-    private Queue<Integer> end;//end index
+    private Queue<DataArea> dataAreas;
+
+    private class DataArea implements Comparable<DataArea> {
+        int startIndex;
+        int endIndex;
+        int maxValueIndex;
+        double maxValue;
+
+        DataArea(int startIndex, int endIndex, int maxValueIndex, double maxValue) {
+            this.startIndex = startIndex;
+            this.endIndex = endIndex;
+            this.maxValueIndex = maxValueIndex;
+            this.maxValue = maxValue;
+        }
+
+        @Override
+        public int compareTo(@NonNull DataArea dataArea) {
+            if (maxValue > dataArea.maxValue) {
+                return -1;
+            } else if (maxValue < dataArea.maxValue) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+    }
 
     /**
      * init
@@ -27,8 +53,10 @@ public class CorrelationAnalyzer {
      */
     CorrelationAnalyzer(int amount) {
         result = new int[amount];
-        start = new LinkedList<>();
-        end = new LinkedList<>();
+        for (int i = 0; i < amount; ++i) {
+            result[i] = -1;
+        }
+        dataAreas = new PriorityQueue<>();
     }
 
     /**
@@ -39,34 +67,28 @@ public class CorrelationAnalyzer {
      */
     public int[] cal(double[] correlationData) {
         int count = 0;
-        start.offer(0);
-        end.offer(correlationData.length);
-        while (!start.isEmpty() && !end.isEmpty() && (count < result.length)) {
-            int leftIndex = start.poll();
-            int rightIndex = end.poll();
-            int iMax = findMax(correlationData, leftIndex, rightIndex);
-            int iReal = findFirstPeak(
-                    correlationData,
-                    (iMax - window) > 0 ? (iMax - window) : 0,
-                    iMax,
-                    correlationData[iMax] / rate);
-            if (iMax - gap > leftIndex) {
-                start.offer(leftIndex);
-                end.offer(iMax - gap);
-            }
-            if (iMax + gap < rightIndex) {
-                start.offer(iMax + gap);
-                end.offer(rightIndex);
-            }
+        int iMax = findMax(correlationData, 0, correlationData.length);
+        DataArea d = new DataArea(0, correlationData.length, iMax, correlationData[iMax]);
+        dataAreas.offer(d);
+        while (!dataAreas.isEmpty() && count < result.length) {
+            DataArea tmp = dataAreas.poll();
+            int iReal = findFirstPeak(correlationData, tmp.maxValueIndex - window, tmp.maxValueIndex, tmp.maxValue / rate);
             result[count] = iReal;
             count++;
+            if (tmp.maxValueIndex - gap > tmp.startIndex) {
+                int iMax1 = findMax(correlationData, tmp.startIndex, tmp.maxValueIndex - gap);
+                DataArea tmp1 = new DataArea(tmp.startIndex, tmp.maxValueIndex - gap, iMax1, correlationData[iMax1]);
+                dataAreas.offer(tmp1);
+            }
+            if (tmp.maxValueIndex + gap < tmp.endIndex) {
+                int iMax2 = findMax(correlationData, tmp.maxValueIndex + gap, tmp.endIndex);
+                DataArea tmp2 = new DataArea(tmp.maxValueIndex + gap, tmp.endIndex, iMax2, correlationData[iMax2]);
+                dataAreas.offer(tmp2);
+            }
         }
-        while (!start.isEmpty()) {
-            start.poll();
+        while (!dataAreas.isEmpty()) {
+            dataAreas.poll();
         }
-        while (!end.isEmpty()) {
-            end.poll();
-        }//flush
         Arrays.sort(result);
         return result;
     }
