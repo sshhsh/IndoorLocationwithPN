@@ -1,9 +1,5 @@
 package com.example.zhucebiao.indoorlocationwithpn;
 
-/**
- * Created by zhucebiao on 17-11-22.
- */
-
 import org.jtransforms.fft.DoubleFFT_1D;
 
 public class CrossCorrelation {
@@ -15,6 +11,11 @@ public class CrossCorrelation {
     private int len;
     private DoubleFFT_1D fft;
 
+    /**
+     * init
+     *
+     * @param length the length of the longData
+     */
     public CrossCorrelation(int length) {
         len = length;
         fft = new DoubleFFT_1D(length);
@@ -25,6 +26,13 @@ public class CrossCorrelation {
         r = new double[len];
     }
 
+    /**
+     * Calculate the cross-correlation between longData and sequence
+     *
+     * @param longData the raw sound data you get
+     * @param sequence your PN sequence
+     * @return result with the same length as longData
+     */
     public double[] getResult(short[] longData, short[] sequence) {
         if (len != longData.length)
             return null;
@@ -52,6 +60,10 @@ public class CrossCorrelation {
         return r;
     }
 
+    /**
+     * ideal frequency filter
+     * @param a raw sound data
+     */
     private void filt(double[] a) {
         int t1 = 17000 * len / 44100;
         int t2 = 22000 * len / 44100;
