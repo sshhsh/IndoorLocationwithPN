@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    /***********************
+    /**
      * 将伪随机序列从raw中读取出来
      */
     private void getPnDataFromRes() {

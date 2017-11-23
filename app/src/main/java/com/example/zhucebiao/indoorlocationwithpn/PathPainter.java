@@ -160,7 +160,7 @@ public class PathPainter extends SurfaceView implements SurfaceHolder.Callback {
         if (mCanvas == null) return;
         mCanvas.drawColor(Color.WHITE);
         mCanvas.drawPath(path, p);
-        mCanvas.drawText(Double.toString((double) index / len * 44100 / len), 0, 40, pText);
+        mCanvas.drawText(Double.toString((double) index / len * 48000 / len), 0, 40, pText);
         mCanvas.drawLine(w / 2, 0, w / 2, h, p);
         mHolder.unlockCanvasAndPost(mCanvas);
     }

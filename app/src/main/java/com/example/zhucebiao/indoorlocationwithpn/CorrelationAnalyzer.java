@@ -72,7 +72,7 @@ public class CorrelationAnalyzer {
         dataAreas.offer(d);
         while (!dataAreas.isEmpty() && count < result.length) {
             DataArea tmp = dataAreas.poll();
-            int iReal = findFirstPeak(correlationData, tmp.maxValueIndex - window, tmp.maxValueIndex, tmp.maxValue / rate);
+            int iReal = findFirstPeak(correlationData, (tmp.maxValueIndex - window) > 0 ? (tmp.maxValueIndex - window) : 0, tmp.maxValueIndex, tmp.maxValue / rate);
             result[count] = iReal;
             count++;
             if (tmp.maxValueIndex - gap > tmp.startIndex) {
@@ -125,7 +125,7 @@ public class CorrelationAnalyzer {
         int index = -1;
         for (int i = startIndex; i < endIndex; ++i) {
             if (data[i] > accessibleValue) {
-                for (int j = i; j < endIndex; ++j) {
+                for (int j = i + 1; j < endIndex; ++j) {
                     if (data[j - 1] > data[j]) {
                         index = j - 1;
                         break;
