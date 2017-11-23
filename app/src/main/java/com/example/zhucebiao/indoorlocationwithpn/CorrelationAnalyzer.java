@@ -21,7 +21,7 @@ public class CorrelationAnalyzer {
     private int[] result;
     private Queue<DataArea> dataAreas;
 
-    private class DataArea implements Comparable<DataArea> {
+    public class DataArea implements Comparable<DataArea> {
         int startIndex;
         int endIndex;
         int maxValueIndex;
