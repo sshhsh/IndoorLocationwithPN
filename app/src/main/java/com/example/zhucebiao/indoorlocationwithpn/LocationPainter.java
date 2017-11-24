@@ -104,7 +104,8 @@ public class LocationPainter extends SurfaceView implements SurfaceHolder.Callba
         if (mCanvas == null) return;
         int height = this.getHeight();
         int width = this.getWidth();
-        mCanvas.drawRect(0, 0, width, height, paintLine);
+        mCanvas.drawColor(0xFFFFFFF8);
+        mCanvas.drawRect(0, 0, width - 1, height - 1, paintLine);
     }
 
     /**
