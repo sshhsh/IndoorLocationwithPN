@@ -60,7 +60,8 @@ public class LocationCalculatorAndroidTest {
     public void setUp() throws Exception {
         double[] x = {-1.5, -1.5, 1.5};
         double[] y = {3, 0, 0};
-        calculator = new LocationCalculator(x, y);
+        calculator = new LocationCalculator(3);
+        calculator.updatePosition(x, y);
     }
 
 }
