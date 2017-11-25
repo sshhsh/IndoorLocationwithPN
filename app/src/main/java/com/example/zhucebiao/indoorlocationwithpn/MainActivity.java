@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -14,14 +15,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
     static final int RATE_HZ = 48000;
     static final int BUFFER_SIZE = RATE_HZ * 2;
 
     private AudioRecord record;
+    private long remoteTime = 0;
 
     /**
      * variables for calculation
@@ -145,6 +152,39 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public class RemoteTime extends AsyncTask<String, Integer, Long> {
+
+        @Override
+        protected Long doInBackground(String... strings) {
+            try {
+                URL url = new URL("http://192.168.10.222:3000");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(300);
+                connection.setRequestMethod("GET");
+                if (connection.getResponseCode() == 200) {
+                    InputStream is = connection.getInputStream();
+                    String res = IOUtils.toString(is, "ASCII");
+                    return Long.valueOf(res);
+                } else {
+                    return (long) -1;
+                }
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return (long) 0;
+        }
+
+        @Override
+        protected void onPostExecute(Long aLong) {
+            super.onPostExecute(aLong);
+            remoteTime = aLong;
         }
     }
 }
