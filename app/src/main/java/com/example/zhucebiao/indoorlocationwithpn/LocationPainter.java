@@ -115,24 +115,25 @@ public class LocationPainter extends SurfaceView implements SurfaceHolder.Callba
      * @param y y
      * @return false=fail true=success
      */
-    public boolean giveLocation(double[] x, double[] y) {
+    public boolean giveLocation(double[] x, double[] y, double x0, double y0) {
         if (x.length != y.length) return false;
         if (isWave) return false;
 
         isLocation = true;
 
         if (locationX == null || locationY == null || locationX.length != x.length) {
-            locationX = new float[x.length];
-            locationY = new float[y.length];
+            locationX = new float[x.length + 1];
+            locationY = new float[y.length + 1];
         }
-
+        locationX[0] = (float) x0;
+        locationY[0] = (float) y0;
         xMin = Float.MAX_VALUE;
         xMax = -Float.MAX_VALUE;
         yMin = Float.MAX_VALUE;
         yMax = -Float.MAX_VALUE;
-        for (int i = 0; i < x.length; ++i) {
-            locationX[i] = (float) x[i];
-            locationY[i] = (float) y[i];
+        for (int i = 1; i < x.length + 1; ++i) {
+            locationX[i] = (float) x[i - 1];
+            locationY[i] = (float) y[i - 1];
             if (xMin > locationX[i]) xMin = locationX[i];
             if (xMax < locationX[i]) xMax = locationX[i];
             if (yMin > locationY[i]) yMin = locationY[i];
