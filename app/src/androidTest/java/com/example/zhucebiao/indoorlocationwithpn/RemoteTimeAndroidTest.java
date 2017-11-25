@@ -24,7 +24,7 @@ public class RemoteTimeAndroidTest {
     public void doInBackground() throws Exception {
         long[] r = new long[1], a = new long[1];
         r[0] = t();
-        a[0] = System.currentTimeMillis();
+        a[0] = 0;
         assertArrayEquals(a, r);
     }
 
@@ -32,12 +32,14 @@ public class RemoteTimeAndroidTest {
         try {
             URL url = new URL("http://192.168.10.222:3000");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(300);
+            connection.setConnectTimeout(100);
             connection.setRequestMethod("GET");
+            long timeNow = System.currentTimeMillis();
             if (connection.getResponseCode() == 200) {
+                long diff = System.currentTimeMillis() - timeNow;
                 InputStream is = connection.getInputStream();
                 String res = IOUtils.toString(is, "ASCII");
-                return Long.valueOf(res);
+                return Long.valueOf(res) - timeNow - diff / 2;
             } else {
                 return -1;
             }
