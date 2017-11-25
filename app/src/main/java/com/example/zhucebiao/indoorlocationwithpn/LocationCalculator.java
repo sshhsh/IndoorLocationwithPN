@@ -16,16 +16,25 @@ public class LocationCalculator {
     private final static double lambda = 0.05;
 
     /**
-     * @param nodeX x
-     * @param nodeY y
+     *
+     * @param speakNum number of speakers
      */
-    public LocationCalculator(double[] nodeX, double[] nodeY) {
-        this.nodeX = nodeX;
-        this.nodeY = nodeY;
-        n = nodeX.length - 1;
+    public LocationCalculator(int speakNum) {
+        nodeX = new double[speakNum];
+        nodeY = new double[speakNum];
+
+        n = speakNum - 1;
 
         f = new double[n];
         result = new double[2];
+    }
+
+    public void updatePosition(double[] x, double[] y) {
+        if (x.length != nodeX.length) return;
+        for (int i = 0; i < x.length; ++i) {
+            nodeX[i] = x[i];
+            nodeY[i] = y[i];
+        }
     }
 
     public double[] cal(double[] dd) {
