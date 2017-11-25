@@ -1,6 +1,7 @@
 package com.example.zhucebiao.indoorlocationwithpn;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -26,9 +27,10 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity {
     static final int RATE_HZ = 48000;
     static final int BUFFER_SIZE = RATE_HZ * 2;
+    static final String REMOTE_URL = "http://192.168.10.222:3000";
 
     private AudioRecord record;
-    private long remoteTime = 0;
+    private long remoteTimeOffset = 0;
 
     /**
      * variables for calculation
@@ -75,6 +77,12 @@ public class MainActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        long timeNow = System.currentTimeMillis() % 2000;
+                        try {
+                            Thread.sleep((4000 - timeNow - remoteTimeOffset % 2000) % 2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         start();
                     }
                 }).start();
@@ -91,12 +99,19 @@ public class MainActivity extends AppCompatActivity {
         y = new double[3];
         dd = new double[2];
         getPnDataFromRes();
+
+        new RemoteTime().execute(REMOTE_URL);
     }
 
+    /**
+     * start calculating the location
+     */
     private void start() {
+        Log.e("time", Long.toString(System.currentTimeMillis() + remoteTimeOffset));
         updateSpeakerPosition();
         record.startRecording();
         record.read(rawSound, 0, BUFFER_SIZE);
+        record.stop();
         double[] correlationData = correlation.getResult(rawSound, pnData);
         int[] resultIndex = analyzer.cal(correlationData);
         painterWave1.giveWave(correlationData, resultIndex[0]);
@@ -109,6 +124,9 @@ public class MainActivity extends AppCompatActivity {
         painterLocation.giveLocation(x, y, result[0], result[1]);
     }
 
+    /**
+     * save the speakers' position data from input boxes
+     */
     private void updateSpeakerPosition() {
         x[0] = Double.valueOf(textX1.getText().toString());
         x[1] = Double.valueOf(textX2.getText().toString());
@@ -155,25 +173,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public class RemoteTime extends AsyncTask<String, Integer, Long> {
+    @SuppressLint("StaticFieldLeak")
+    private class RemoteTime extends AsyncTask<String, Integer, Long> {
 
         @Override
         protected Long doInBackground(String... strings) {
             try {
-                URL url = new URL("http://192.168.10.222:3000");
+                URL url = new URL(strings[0]);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setConnectTimeout(300);
                 connection.setRequestMethod("GET");
+                long timeNow = System.currentTimeMillis();
                 if (connection.getResponseCode() == 200) {
+                    long diff = System.currentTimeMillis() - timeNow;
                     InputStream is = connection.getInputStream();
                     String res = IOUtils.toString(is, "ASCII");
-                    return Long.valueOf(res);
+                    return Long.valueOf(res) - timeNow - diff / 2;
                 } else {
                     return (long) -1;
                 }
 
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -184,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Long aLong) {
             super.onPostExecute(aLong);
-            remoteTime = aLong;
+            remoteTimeOffset = aLong;
         }
     }
 }
