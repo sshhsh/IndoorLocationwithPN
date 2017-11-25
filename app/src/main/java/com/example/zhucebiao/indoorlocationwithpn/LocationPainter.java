@@ -87,8 +87,8 @@ public class LocationPainter extends SurfaceView implements SurfaceHolder.Callba
         mCanvas = mHolder.lockCanvas();
         if (mCanvas == null) return;
         drawBox();
-        if (isLocation) drawLocation();
-        if (isWave) drawWave();
+        drawLocation();
+        drawWave();
         mHolder.unlockCanvasAndPost(mCanvas);
     }
 
@@ -131,6 +131,10 @@ public class LocationPainter extends SurfaceView implements SurfaceHolder.Callba
         xMax = -Float.MAX_VALUE;
         yMin = Float.MAX_VALUE;
         yMax = -Float.MAX_VALUE;
+        if (xMin > locationX[0]) xMin = locationX[0];
+        if (xMax < locationX[0]) xMax = locationX[0];
+        if (yMin > locationY[0]) yMin = locationY[0];
+        if (yMax < locationY[0]) yMax = locationY[0];
         for (int i = 1; i < x.length + 1; ++i) {
             locationX[i] = (float) x[i - 1];
             locationY[i] = (float) y[i - 1];
@@ -148,6 +152,7 @@ public class LocationPainter extends SurfaceView implements SurfaceHolder.Callba
     }
 
     private void drawLocation() {
+        if (!isLocation) return;
         if (mCanvas == null) return;
         int height = this.getHeight();
         int width = this.getWidth();
@@ -193,11 +198,11 @@ public class LocationPainter extends SurfaceView implements SurfaceHolder.Callba
         isWave = true;
 
         int len = y.length;
-        int index_start = index - 1000 / 2 / rate;
+        int index_start = index - 500 / 2 / rate;
         if (index_start < 0) {
             index_start = 0;
         }
-        int index_end = index_start + 1000 / rate;
+        int index_end = index_start + 500 / rate;
         if (index_end > len) {
             index_end = len;
             index_start = index_end - len;
@@ -219,13 +224,14 @@ public class LocationPainter extends SurfaceView implements SurfaceHolder.Callba
         drawBox();
         maxIndex = index - index_start;
         dataLength = index_end - index_start;
-        time = Double.toString((double) index / len * 48000 / len);
+        time = Double.toString((double) index / 48000);
         drawWave();
         mHolder.unlockCanvasAndPost(mCanvas);
         return true;
     }
 
     private void drawWave() {
+        if (!isWave) return;
         if (mCanvas == null) return;
         int height = this.getHeight();
         int width = this.getWidth();
@@ -238,9 +244,9 @@ public class LocationPainter extends SurfaceView implements SurfaceHolder.Callba
         Path path = new Path();
         path.moveTo(0, height - (waveData[0] - yMin) * slopeY);
         for (int i = 1; i < dataLength - 1; ++i) {
-            path.lineTo(i * slopeX, (waveData[i] - yMin) * slopeY);
+            path.lineTo(i * slopeX, height - (waveData[i] - yMin) * slopeY);
         }
-        path.setLastPoint((dataLength - 1) * slopeX, height - 1 - (waveData[dataLength - 1] - yMin) * slopeY);
+        path.setLastPoint((dataLength - 1) * slopeX, height - (waveData[dataLength - 1] - yMin) * slopeY);
         mCanvas.drawPath(path, paintLine);
         mCanvas.drawText(time, 0, 40, paintText);
     }

@@ -102,7 +102,7 @@ public class CorrelationAnalyzer {
      * @return the index of maximum value among data
      */
     private int findMax(double[] data, int startIndex, int endIndex) {
-        double tmp = 0;
+        double tmp = -Double.MAX_VALUE;
         int index = -1;
         for (int i = startIndex; i < endIndex; ++i) {
             if (data[i] > tmp) {
