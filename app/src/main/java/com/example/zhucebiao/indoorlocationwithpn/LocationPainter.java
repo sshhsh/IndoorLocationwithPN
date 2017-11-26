@@ -6,8 +6,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
+
+import java.util.Locale;
 
 /**
  * LocationPainter
@@ -51,10 +54,21 @@ public class LocationPainter extends SurfaceView implements SurfaceHolder.Callba
         init();
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (!isLocation) return false;
+        mCanvas = mHolder.lockCanvas();
+        drawBox();
+        drawLocation(event.getX(), event.getY());
+        mHolder.unlockCanvasAndPost(mCanvas);
+        return super.onTouchEvent(event);
+    }
+
     /**
      * init and set the paints
      */
     private void init() {
+        setFocusable(true);
         mHolder = getHolder();
         mHolder.addCallback(this);
 
@@ -151,7 +165,7 @@ public class LocationPainter extends SurfaceView implements SurfaceHolder.Callba
         return true;
     }
 
-    private void drawLocation() {
+    private void drawLocation(float... floats) {
         if (!isLocation) return;
         if (mCanvas == null) return;
         int height = this.getHeight();
@@ -177,12 +191,38 @@ public class LocationPainter extends SurfaceView implements SurfaceHolder.Callba
         float y0 = (locationY[0] - yMin) * slopeY + offsetY;
         y0 = height - 1 - y0;
         mCanvas.drawCircle(x0, y0, 15, paintCircle);
+        mCanvas.drawLine(x0 - 20, y0, x0 + 20, y0, paintLine);
+        mCanvas.drawLine(x0, y0 - 20, x0, y0 + 20, paintLine);
+
+        double tmpD = Double.MAX_VALUE;
+        int tmpIndex = -1;
+        if (floats.length == 2) {
+            tmpD = Math.sqrt(Math.pow(floats[0] - x0, 2) + Math.pow(floats[1] - y0, 2));
+            tmpIndex = 0;
+        }
 
         for (int i = 1; i < locationX.length; ++i) {
             float x = (locationX[i] - xMin) * slopeX + offsetX;
             float y = (locationY[i] - yMin) * slopeY + offsetY;
             y = height - 1 - y;
             mCanvas.drawCircle(x, y, 10, paintCircle);
+
+            if (floats.length == 2) {
+                double tmpD2 = Math.sqrt(Math.pow(floats[0] - x, 2) + Math.pow(floats[1] - y, 2));
+                if (tmpD > tmpD2) {
+                    tmpD = tmpD2;
+                    tmpIndex = i;
+                }
+            }
+        }
+        if (floats.length == 2) {
+            float x = (locationX[tmpIndex] - xMin) * slopeX + offsetX;
+            float y = (locationY[tmpIndex] - yMin) * slopeY + offsetY;
+            y = height - 1 - y;
+            mCanvas.drawLine(floats[0] * 0.95f + x * 0.05f, floats[1] * 0.95f + y * 0.05f,
+                    floats[0] * 0.05f + x * 0.95f, floats[1] * 0.05f + y * 0.95f, paintLine);
+            String s = String.format(Locale.getDefault(), "(%.2f, %.2f)", locationX[tmpIndex], locationY[tmpIndex]);
+            mCanvas.drawText(s, floats[0], floats[1], paintText);
         }
     }
 
