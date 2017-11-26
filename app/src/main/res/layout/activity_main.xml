@@ -9,13 +9,12 @@
     <view
         android:id="@+id/locationView"
         class="com.example.zhucebiao.indoorlocationwithpn.LocationPainter"
-        id="@+id/view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline3"
+        app:layout_constraintBottom_toTopOf="@id/guideline3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -43,7 +42,7 @@
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="@id/guideline"
         app:layout_constraintTop_toBottomOf="@id/locationView">
 
         <android.support.constraint.Guideline
@@ -55,6 +54,7 @@
 
         <EditText
             android:id="@+id/y1"
+            android:labelFor="@+id/y1"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="4dp"
@@ -62,16 +62,16 @@
             android:inputType="numberDecimal"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:text="3"
+            android:text="@string/init_y1"
             android:textSize="18sp"
-            app:layout_constraintBottom_toTopOf="@+id/y2"
+            app:layout_constraintBottom_toBottomOf="@id/x1"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/guideline2"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_weight="1" />
+            app:layout_constraintStart_toStartOf="@id/guideline2"
+            app:layout_constraintTop_toTopOf="@id/x1" />
 
         <EditText
             android:id="@+id/y2"
+            android:labelFor="@+id/y2"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="4dp"
@@ -79,15 +79,15 @@
             android:inputType="numberDecimal"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:text="0"
-            app:layout_constraintBottom_toTopOf="@+id/y3"
+            android:text="@string/init_y2"
+            app:layout_constraintBottom_toBottomOf="@id/x2"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/guideline2"
-            app:layout_constraintTop_toBottomOf="@+id/y1"
-            app:layout_constraintVertical_weight="1" />
+            app:layout_constraintStart_toStartOf="@id/guideline2"
+            app:layout_constraintTop_toTopOf="@id/x2" />
 
         <EditText
             android:id="@+id/y3"
+            android:labelFor="@+id/y3"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="4dp"
@@ -95,27 +95,15 @@
             android:inputType="numberDecimal"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:text="0"
-            app:layout_constraintBottom_toTopOf="@+id/buttonStop"
+            android:text="@string/init_y3"
+            app:layout_constraintBottom_toBottomOf="@id/x3"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/guideline2"
-            app:layout_constraintTop_toBottomOf="@+id/y2"
-            app:layout_constraintVertical_weight="1" />
-
-        <Button
-            android:id="@+id/buttonStop"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="4dp"
-            android:text="Stop"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/guideline2"
-            app:layout_constraintTop_toBottomOf="@+id/y3"
-            app:layout_constraintVertical_weight="1.1" />
+            app:layout_constraintStart_toStartOf="@id/guideline2"
+            app:layout_constraintTop_toTopOf="@id/x3" />
 
         <EditText
             android:id="@+id/x1"
+            android:labelFor="@+id/x1"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginEnd="4dp"
@@ -123,15 +111,16 @@
             android:inputType="numberDecimal"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:text="-1.5"
-            app:layout_constraintBottom_toTopOf="@+id/x2"
-            app:layout_constraintEnd_toStartOf="@+id/guideline2"
+            android:text="@string/init_x1"
+            app:layout_constraintBottom_toTopOf="@id/x2"
+            app:layout_constraintEnd_toStartOf="@id/guideline2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_weight="1" />
 
         <EditText
             android:id="@+id/x2"
+            android:labelFor="@+id/x2"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginEnd="4dp"
@@ -139,15 +128,16 @@
             android:inputType="numberDecimal"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:text="-1.5"
-            app:layout_constraintBottom_toTopOf="@+id/x3"
-            app:layout_constraintEnd_toStartOf="@+id/guideline2"
+            android:text="@string/init_x2"
+            app:layout_constraintBottom_toTopOf="@id/x3"
+            app:layout_constraintEnd_toStartOf="@id/guideline2"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/x1"
+            app:layout_constraintTop_toBottomOf="@id/x1"
             app:layout_constraintVertical_weight="1" />
 
         <EditText
             android:id="@+id/x3"
+            android:labelFor="@+id/x3"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginEnd="4dp"
@@ -155,23 +145,22 @@
             android:inputType="numberDecimal"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:text="1.5"
-            app:layout_constraintBottom_toTopOf="@+id/buttonStart"
-            app:layout_constraintEnd_toStartOf="@+id/guideline2"
+            android:text="@string/init_x3"
+            app:layout_constraintBottom_toTopOf="@id/buttonStart"
+            app:layout_constraintEnd_toStartOf="@id/guideline2"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/x2"
+            app:layout_constraintTop_toBottomOf="@id/x2"
             app:layout_constraintVertical_weight="1" />
 
         <Button
             android:id="@+id/buttonStart"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginEnd="4dp"
-            android:text="Start"
+            android:text="@string/buttonStartText"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/guideline2"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/x3"
+            app:layout_constraintTop_toBottomOf="@id/x3"
             app:layout_constraintVertical_weight="1.1" />
     </android.support.constraint.ConstraintLayout>
 
@@ -183,19 +172,18 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/guideline"
+        app:layout_constraintEnd_toEndOf="@id/guideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline3">
+        app:layout_constraintTop_toTopOf="@id/guideline3">
 
         <view
             android:id="@+id/waveView1"
             class="com.example.zhucebiao.indoorlocationwithpn.LocationPainter"
-            id="@+id/view2"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="4dp"
             android:layout_marginTop="4dp"
-            app:layout_constraintBottom_toTopOf="@+id/waveView2"
+            app:layout_constraintBottom_toTopOf="@id/waveView2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -203,20 +191,18 @@
         <view
             android:id="@+id/waveView2"
             class="com.example.zhucebiao.indoorlocationwithpn.LocationPainter"
-            id="@+id/view3"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="4dp"
             android:layout_marginTop="4dp"
-            app:layout_constraintBottom_toTopOf="@+id/waveView3"
+            app:layout_constraintBottom_toTopOf="@id/waveView3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/waveView1" />
+            app:layout_constraintTop_toBottomOf="@id/waveView1" />
 
         <view
             android:id="@+id/waveView3"
             class="com.example.zhucebiao.indoorlocationwithpn.LocationPainter"
-            id="@+id/view4"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="4dp"
@@ -224,7 +210,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/waveView2" />
+            app:layout_constraintTop_toBottomOf="@id/waveView2" />
     </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

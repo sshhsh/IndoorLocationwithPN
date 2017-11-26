@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Indoor Location with PN</string>
+    <string name="buttonStartText">Start</string>
+    <string name="init_x3">1.5</string>
+    <string name="init_x2">-1.5</string>
+    <string name="init_x1">-1.5</string>
+    <string name="init_y3">0</string>
+    <string name="init_y2">0</string>
+    <string name="init_y1">3</string>
 </resources>

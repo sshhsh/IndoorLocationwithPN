@@ -21,7 +21,6 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
      * variables for display
      */
     private LocationPainter painterLocation, painterWave1, painterWave2, painterWave3;
-    private Button buttonStart, buttonStop;
+    private Button buttonStart;
     private EditText textX1, textX2, textX3, textY1, textY2, textY3;
 
     @Override
@@ -64,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
         painterWave2 = findViewById(R.id.waveView2);
         painterWave3 = findViewById(R.id.waveView3);
         buttonStart = findViewById(R.id.buttonStart);
-        buttonStop = findViewById(R.id.buttonStop);
         textX1 = findViewById(R.id.x1);
         textX2 = findViewById(R.id.x2);
         textX3 = findViewById(R.id.x3);
@@ -74,18 +72,7 @@ public class MainActivity extends AppCompatActivity {
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        long timeNow = System.currentTimeMillis() % 2000;
-                        try {
-                            Thread.sleep((4000 - timeNow - remoteTimeOffset % 2000) % 2000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        start();
-                    }
-                }).start();
+                new CalculationTask().execute();
             }
         });
 
@@ -205,6 +192,35 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(aLong);
             remoteTimeOffset = aLong;
             Log.e("timeDiff", Long.toString(remoteTimeOffset));
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private class CalculationTask extends AsyncTask<Integer, Integer, Integer> {
+
+        @Override
+        protected Integer doInBackground(Integer... integers) {
+            long timeNow = System.currentTimeMillis() % 2000;
+            try {
+                Thread.sleep((4000 - timeNow - remoteTimeOffset % 2000) % 2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return -1;
+            }
+            start();
+            return 0;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            buttonStart.setEnabled(false);
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            buttonStart.setEnabled(true);
         }
     }
 }
