@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import org.apache.commons.io.IOUtils;
 
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationPainter painterLocation, painterWave1, painterWave2, painterWave3;
     private Button buttonStart;
     private EditText textX1, textX2, textX3, textY1, textY2, textY3;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         textY1 = findViewById(R.id.y1);
         textY2 = findViewById(R.id.y2);
         textY3 = findViewById(R.id.y3);
+        progressBar = findViewById(R.id.progressBar);
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,27 +91,6 @@ public class MainActivity extends AppCompatActivity {
         getPnDataFromRes();
 
         new RemoteTime().execute(REMOTE_URL);
-    }
-
-    /**
-     * start calculating the location
-     */
-    private void start() {
-        Log.e("time", Long.toString(System.currentTimeMillis() + remoteTimeOffset));
-        updateSpeakerPosition();
-        record.startRecording();
-        record.read(rawSound, 0, BUFFER_SIZE);
-        record.stop();
-        double[] correlationData = correlation.getResult(rawSound, pnData);
-        int[] resultIndex = analyzer.cal(correlationData);
-        painterWave1.giveWave(correlationData, resultIndex[0]);
-        painterWave2.giveWave(correlationData, resultIndex[1]);
-        painterWave3.giveWave(correlationData, resultIndex[2]);
-
-        dd[0] = -((double) (resultIndex[1] - resultIndex[0]) / RATE_HZ - 0.5) * 340;
-        dd[1] = -((double) (resultIndex[2] - resultIndex[1]) / RATE_HZ - 0.5) * 340;
-        double[] result = locationCalculator.cal(dd);
-        painterLocation.giveLocation(x, y, result[0], result[1]);
     }
 
     /**
@@ -199,6 +181,17 @@ public class MainActivity extends AppCompatActivity {
     private class CalculationTask extends AsyncTask<Integer, Integer, Integer> {
 
         @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            if (values[0] == 1) {
+                progressBar.setVisibility(View.VISIBLE);
+            }
+            if (values[0] == 0) {
+                progressBar.setVisibility(View.GONE);
+            }
+        }
+
+        @Override
         protected Integer doInBackground(Integer... integers) {
             long timeNow = System.currentTimeMillis() % 2000;
             try {
@@ -207,7 +200,23 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
                 return -1;
             }
-            start();
+            Log.e("time", Long.toString(System.currentTimeMillis() + remoteTimeOffset));
+            updateSpeakerPosition();
+            record.startRecording();
+            publishProgress(1);
+            record.read(rawSound, 0, BUFFER_SIZE);
+            publishProgress(0);
+            record.stop();
+            double[] correlationData = correlation.getResult(rawSound, pnData);
+            int[] resultIndex = analyzer.cal(correlationData);
+            painterWave1.giveWave(correlationData, resultIndex[0]);
+            painterWave2.giveWave(correlationData, resultIndex[1]);
+            painterWave3.giveWave(correlationData, resultIndex[2]);
+
+            dd[0] = -((double) (resultIndex[1] - resultIndex[0]) / RATE_HZ - 0.5) * 340;
+            dd[1] = -((double) (resultIndex[2] - resultIndex[1]) / RATE_HZ - 0.5) * 340;
+            double[] result = locationCalculator.cal(dd);
+            painterLocation.giveLocation(x, y, result[0], result[1]);
             return 0;
         }
 
