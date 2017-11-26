@@ -105,8 +105,8 @@ public class MainActivity extends AppCompatActivity {
         painterWave2.giveWave(correlationData, resultIndex[1]);
         painterWave3.giveWave(correlationData, resultIndex[2]);
 
-        dd[0] = ((double) (resultIndex[1] - resultIndex[0]) / RATE_HZ - 0.5) * 340;
-        dd[1] = ((double) (resultIndex[2] - resultIndex[1]) / RATE_HZ - 0.5) * 340;
+        dd[0] = -((double) (resultIndex[1] - resultIndex[0]) / RATE_HZ - 0.5) * 340;
+        dd[1] = -((double) (resultIndex[2] - resultIndex[1]) / RATE_HZ - 0.5) * 340;
         double[] result = locationCalculator.cal(dd);
         painterLocation.giveLocation(x, y, result[0], result[1]);
     }
