@@ -223,7 +223,7 @@ public class LocationPainter extends SurfaceView implements SurfaceHolder.Callba
             float y = (locationY[tmpIndex] - yMin) * slopeY + offsetY;
             y = height - 1 - y;
             mCanvas.drawLine(floats[0] * 0.95f + x * 0.05f, floats[1] * 0.95f + y * 0.05f,
-                    floats[0] * 0.05f + x * 0.95f, floats[1] * 0.05f + y * 0.95f, paintLine);
+                    floats[0] * 0.05f + x * 0.95f, floats[1] * 0.05f + y * 0.95f, paintCircle);
             String s = String.format(Locale.getDefault(), "(%.2f, %.2f)", locationX[tmpIndex], locationY[tmpIndex]);
             mCanvas.drawText(s, floats[0], floats[1], paintText);
         }
