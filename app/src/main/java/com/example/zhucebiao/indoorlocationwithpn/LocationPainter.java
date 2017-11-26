@@ -76,16 +76,19 @@ public class LocationPainter extends SurfaceView implements SurfaceHolder.Callba
         paintLine.setColor(Color.GRAY);
         paintLine.setStyle(Paint.Style.STROKE);
         paintLine.setStrokeWidth(1);
+        paintLine.setAntiAlias(false);
 
         paintCircle = new Paint();
         paintCircle.setColor(Color.BLUE);
         paintCircle.setStyle(Paint.Style.STROKE);
         paintCircle.setStrokeWidth(2);
+        paintCircle.setAntiAlias(true);
 
         paintText = new Paint();
         paintText.setColor(Color.BLACK);
         paintText.setTextSize(40);
         paintText.setStrokeWidth(1);
+        paintCircle.setAntiAlias(true);
     }
 
     @Override
@@ -278,7 +281,7 @@ public class LocationPainter extends SurfaceView implements SurfaceHolder.Callba
 
         yMin -= 10;
         yMax += 10;
-        float slopeX = width / dataLength;
+        float slopeX = (float) width / dataLength;
         float slopeY = height / (yMax - yMin);
         mCanvas.drawLine(maxIndex * slopeX, 0, maxIndex * slopeX, height, paintLine);
         Path path = new Path();
