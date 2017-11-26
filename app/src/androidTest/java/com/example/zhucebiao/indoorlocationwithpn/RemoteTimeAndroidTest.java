@@ -30,7 +30,7 @@ public class RemoteTimeAndroidTest {
 
     private long t() {
         try {
-            URL url = new URL("http://192.168.10.222:3000");
+            URL url = new URL("http://192.168.1.100:3000");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setConnectTimeout(100);
             connection.setRequestMethod("GET");

@@ -27,7 +27,7 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity {
     static final int RATE_HZ = 48000;
     static final int BUFFER_SIZE = RATE_HZ * 2;
-    static final String REMOTE_URL = "http://192.168.10.222:3000";
+    static final String REMOTE_URL = "http://192.168.1.100:3000";
 
     private AudioRecord record;
     private long remoteTimeOffset = 0;
@@ -204,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Long aLong) {
             super.onPostExecute(aLong);
             remoteTimeOffset = aLong;
+            Log.e("timeDiff", Long.toString(remoteTimeOffset));
         }
     }
 }
