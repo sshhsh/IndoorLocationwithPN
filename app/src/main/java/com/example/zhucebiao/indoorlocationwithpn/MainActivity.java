@@ -192,9 +192,6 @@ public class MainActivity extends AppCompatActivity {
                     painterWave2.giveWave(correlationData, resultIndex[1]);
                     painterWave3.giveWave(correlationData, resultIndex[2]);
                     break;
-                case 3:
-                    painterLocation.giveLocation(x, y, result[0], result[1]);
-                    break;
             }
         }
 
@@ -221,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
             dd[0] = -((double) (resultIndex[1] - resultIndex[0]) / RATE_HZ - 0.25) * 340;
             dd[1] = -((double) (resultIndex[2] - resultIndex[1]) / RATE_HZ - 0.25) * 340;
             result = locationCalculator.cal(dd);
-            publishProgress(3);
+            painterLocation.giveLocation(x, y, result[0], result[1]);
             return 0;
         }
 
