@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         getPnDataFromRes();
 
         new RemoteTime().execute(REMOTE_URL);
+        buttonStart.setEnabled(true);
     }
 
     /**
@@ -172,15 +173,28 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("StaticFieldLeak")
     private class CalculationTask extends AsyncTask<Integer, Integer, Integer> {
+        double[] correlationData;
+        int[] resultIndex;
+        double[] result;//location result
 
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-            if (values[0] == 1) {
-                progressBar.setVisibility(View.VISIBLE);
-            }
-            if (values[0] == 0) {
-                progressBar.setVisibility(View.GONE);
+            switch (values[0]) {
+                case 0:
+                    progressBar.setVisibility(View.GONE);
+                    break;
+                case 1:
+                    progressBar.setVisibility(View.VISIBLE);
+                    break;
+                case 2:
+                    painterWave1.giveWave(correlationData, resultIndex[0]);
+                    painterWave2.giveWave(correlationData, resultIndex[1]);
+                    painterWave3.giveWave(correlationData, resultIndex[2]);
+                    break;
+                case 3:
+                    painterLocation.giveLocation(x, y, result[0], result[1]);
+                    break;
             }
         }
 
@@ -200,16 +214,14 @@ public class MainActivity extends AppCompatActivity {
             record.read(rawSound, 0, BUFFER_SIZE);
             publishProgress(0);
             record.stop();
-            double[] correlationData = correlation.getResult(rawSound, pnData);
-            int[] resultIndex = analyzer.cal(correlationData);
-            painterWave1.giveWave(correlationData, resultIndex[0]);
-            painterWave2.giveWave(correlationData, resultIndex[1]);
-            painterWave3.giveWave(correlationData, resultIndex[2]);
+            correlationData = correlation.getResult(rawSound, pnData);
+            resultIndex = analyzer.cal(correlationData);
+            publishProgress(2);
 
             dd[0] = -((double) (resultIndex[1] - resultIndex[0]) / RATE_HZ - 0.25) * 340;
             dd[1] = -((double) (resultIndex[2] - resultIndex[1]) / RATE_HZ - 0.25) * 340;
-            double[] result = locationCalculator.cal(dd);
-            painterLocation.giveLocation(x, y, result[0], result[1]);
+            result = locationCalculator.cal(dd);
+            publishProgress(3);
             return 0;
         }
 
