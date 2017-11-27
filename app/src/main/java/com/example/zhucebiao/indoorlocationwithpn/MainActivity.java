@@ -47,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
     /**
      * variables for display
      */
-    private LocationPainter painterLocation, painterWave1, painterWave2, painterWave3;
+    private LocationPainter painterLocation;
+    private WavePainter painterWave1, painterWave2, painterWave3;
     private Button buttonStart;
     private EditText textX1, textX2, textX3, textY1, textY2, textY3;
     private ProgressBar progressBar;
@@ -130,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
             InputStream in = getResources().openRawResource(R.raw.data48000_18_20_200ms);
             int length = in.available();
             byte[] tmp = new byte[length];
+            //noinspection ResultOfMethodCallIgnored
             in.read(tmp);
             in.close();
             pnData = new short[length / 2];
