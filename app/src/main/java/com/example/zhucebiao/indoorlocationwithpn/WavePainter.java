@@ -156,6 +156,7 @@ public class WavePainter extends SurfaceView implements SurfaceHolder.Callback {
 
     private void updateWaveData(int indexOffset) {
         if (rawWaveData == null) return;
+        if (indexOffset == 0) sumOffset = 0;
         int rawIndex = this.rawIndex + indexOffset;
         int len = rawWaveData.length;
         int index_start = rawIndex - 200 / 2;
