@@ -17,17 +17,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.net.ntp.NTPUDPClient;
+import org.apache.commons.net.ntp.TimeInfo;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.InetAddress;
 
 public class MainActivity extends AppCompatActivity {
     static final int RATE_HZ = 48000;
     static final int BUFFER_SIZE = RATE_HZ * 2;
-    static final String REMOTE_URL = "http://192.168.1.100:3000";
+    static final String REMOTE_URL = "192.168.1.100";
 
     private AudioRecord record;
     private long remoteTimeOffset = 0;
@@ -147,26 +147,19 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Long doInBackground(String... strings) {
+            NTPUDPClient client = new NTPUDPClient();
+            client.setDefaultTimeout(300);
+            Long offsetValue = 0L;
             try {
-                URL url = new URL(strings[0]);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setConnectTimeout(300);
-                connection.setRequestMethod("GET");
-                long timeNow = System.currentTimeMillis();
-                if (connection.getResponseCode() == 200) {
-                    long diff = System.currentTimeMillis() - timeNow;
-                    InputStream is = connection.getInputStream();
-                    String res = IOUtils.toString(is, "ASCII");
-                    return Long.valueOf(res) - timeNow - diff / 2;
-                } else {
-                    return (long) -1;
-                }
-
+                client.open();
+                InetAddress hostAddr = InetAddress.getByName(strings[0]);
+                TimeInfo info = client.getTime(hostAddr);
+                info.computeDetails(); // compute offset/delay if not already done
+                offsetValue = info.getOffset();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            return (long) 0;
+            return offsetValue;
         }
 
         @Override
