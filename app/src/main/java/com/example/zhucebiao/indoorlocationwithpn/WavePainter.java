@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 
@@ -17,17 +18,20 @@ import android.view.SurfaceHolder;
 public class WavePainter extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Canvas mCanvas;
-    private Paint paintLine, paintText;
+    private Paint paintLine, paintLine2, paintText;
 
     private float[] waveData;
     private double[] rawWaveData;
-    private final static int rate = 2;
-    private int maxIndex;
+    private int maxIndex; //position to draw the vertical line
     private int rawIndex;
     private int dataLength;
     private String time;
 
     private float yMin, yMax;
+
+    private float downX;
+    private float slopeX = 1;
+    private int sumOffset = 0;
 
     public WavePainter(Context context) {
         super(context);
@@ -58,6 +62,12 @@ public class WavePainter extends SurfaceView implements SurfaceHolder.Callback {
         paintLine.setStrokeWidth(1);
         paintLine.setAntiAlias(false);
 
+        paintLine2 = new Paint();
+        paintLine2.setColor(Color.BLUE);
+        paintLine2.setStyle(Paint.Style.STROKE);
+        paintLine2.setStrokeWidth(1);
+        paintLine2.setAntiAlias(true);
+
         paintText = new Paint();
         paintText.setColor(Color.BLACK);
         paintText.setTextSize(40);
@@ -76,6 +86,7 @@ public class WavePainter extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
         mCanvas = mHolder.lockCanvas();
         drawBox();
+        updateWaveData(0);
         drawWave();
         mHolder.unlockCanvasAndPost(mCanvas);
     }
@@ -83,6 +94,33 @@ public class WavePainter extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
 
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (rawWaveData == null) return false;
+        performClick();
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                downX = event.getX();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                float moveX = event.getX() - downX;
+                downX = event.getX();
+                sumOffset -= moveX;
+                mCanvas = mHolder.lockCanvas();
+                drawBox();
+                updateWaveData((int) (sumOffset / slopeX));
+                drawWave();
+                mHolder.unlockCanvasAndPost(mCanvas);
+                break;
+        }
+        return super.onTouchEvent(event);
     }
 
     /**
@@ -107,7 +145,7 @@ public class WavePainter extends SurfaceView implements SurfaceHolder.Callback {
         rawWaveData = y;
         rawIndex = index;
 
-        updateWaveData();
+        updateWaveData(0);
 
         mCanvas = mHolder.lockCanvas();
         if (mCanvas == null) return;
@@ -116,18 +154,24 @@ public class WavePainter extends SurfaceView implements SurfaceHolder.Callback {
         mHolder.unlockCanvasAndPost(mCanvas);
     }
 
-    private void updateWaveData() {
+    private void updateWaveData(int indexOffset) {
         if (rawWaveData == null) return;
+        int rawIndex = this.rawIndex + indexOffset;
         int len = rawWaveData.length;
-        int index_start = rawIndex - 500 / 2 / rate;
+        int index_start = rawIndex - 200 / 2;
         if (index_start < 0) {
+            sumOffset += -index_start * slopeX;
             index_start = 0;
         }
-        int index_end = index_start + 500 / rate;
+        int index_end = index_start + 200;
         if (index_end > len) {
+            sumOffset -= (index_end - len) * slopeX;
             index_end = len;
-            index_start = index_end - len;
-            if (index_start < 0) index_start = 0;
+            index_start = index_end - 200;
+            if (index_start < 0) {
+                sumOffset = 0;
+                index_start = 0;
+            }
         }
 
         if (waveData == null || waveData.length < index_end - index_start) {
@@ -141,9 +185,9 @@ public class WavePainter extends SurfaceView implements SurfaceHolder.Callback {
             if (yMax < waveData[i - index_start]) yMax = waveData[i - index_start];
         }
 
-        maxIndex = rawIndex - index_start;
+        maxIndex = this.rawIndex - index_start;
         dataLength = index_end - index_start;
-        time = Double.toString((double) rawIndex / 48000);
+        time = Double.toString((double) this.rawIndex / 48000);
     }
 
     private void drawWave() {
@@ -154,9 +198,9 @@ public class WavePainter extends SurfaceView implements SurfaceHolder.Callback {
 
         yMin -= 10;
         yMax += 10;
-        float slopeX = (float) width / dataLength;
+        slopeX = (float) width / dataLength;
         float slopeY = height / (yMax - yMin);
-        mCanvas.drawLine(maxIndex * slopeX, 0, maxIndex * slopeX, height, paintLine);
+        mCanvas.drawLine(maxIndex * slopeX, 0, maxIndex * slopeX, height, paintLine2);
         Path path = new Path();
         path.moveTo(0, height - (waveData[0] - yMin) * slopeY);
         for (int i = 1; i < dataLength - 1; ++i) {

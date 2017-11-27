@@ -50,12 +50,14 @@ public class LocationPainter extends SurfaceView implements SurfaceHolder.Callba
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (locationX == null || locationY == null) return false;
+        performClick();
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             mCanvas = mHolder.lockCanvas();
             drawBox();
             drawLocation(event.getX(), event.getY());
             mHolder.unlockCanvasAndPost(mCanvas);
-            performClick();
+
         }
         if (event.getAction() == MotionEvent.ACTION_MOVE) {
             mCanvas = mHolder.lockCanvas();
