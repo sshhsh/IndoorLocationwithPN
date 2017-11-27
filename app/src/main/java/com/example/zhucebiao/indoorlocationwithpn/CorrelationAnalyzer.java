@@ -15,8 +15,8 @@ import java.util.Queue;
 
 public class CorrelationAnalyzer {
     static final private int window = 200; //window width for multi path analyze
-    static final private int rate = 10; //rate between largest correlation and the smallest accessible one
-    static final private int gap = 48000 / 1000 * 400; //minimum gap between two signals 400ms
+    static final private double rate = 2.5; //rate between largest correlation and the smallest accessible one
+    static final private int gap = 48000 / 1000 * 200; //minimum gap between two signals is 200ms
 
     private int[] result;
     private Queue<DataArea> dataAreas;

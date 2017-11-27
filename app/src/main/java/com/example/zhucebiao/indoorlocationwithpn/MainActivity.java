@@ -26,7 +26,7 @@ import java.net.InetAddress;
 
 public class MainActivity extends AppCompatActivity {
     static final int RATE_HZ = 48000;
-    static final int BUFFER_SIZE = RATE_HZ * 2;
+    static final int BUFFER_SIZE = RATE_HZ;
     static final String REMOTE_URL = "192.168.1.100";
 
     private AudioRecord record;
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void getPnDataFromRes() {
         try {
-            InputStream in = getResources().openRawResource(R.raw.data48_16_18);
+            InputStream in = getResources().openRawResource(R.raw.data48000_18_20_200ms);
             int length = in.available();
             byte[] tmp = new byte[length];
             in.read(tmp);
@@ -186,9 +186,9 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Integer doInBackground(Integer... integers) {
-            long timeNow = System.currentTimeMillis() % 2000;
+            long timeNow = System.currentTimeMillis() % 1000;
             try {
-                Thread.sleep((4000 - timeNow - remoteTimeOffset % 2000) % 2000);
+                Thread.sleep((2000 - timeNow - remoteTimeOffset % 1000) % 1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 return -1;
@@ -206,8 +206,8 @@ public class MainActivity extends AppCompatActivity {
             painterWave2.giveWave(correlationData, resultIndex[1]);
             painterWave3.giveWave(correlationData, resultIndex[2]);
 
-            dd[0] = -((double) (resultIndex[1] - resultIndex[0]) / RATE_HZ - 0.5) * 340;
-            dd[1] = -((double) (resultIndex[2] - resultIndex[1]) / RATE_HZ - 0.5) * 340;
+            dd[0] = -((double) (resultIndex[1] - resultIndex[0]) / RATE_HZ - 0.25) * 340;
+            dd[1] = -((double) (resultIndex[2] - resultIndex[1]) / RATE_HZ - 0.25) * 340;
             double[] result = locationCalculator.cal(dd);
             painterLocation.giveLocation(x, y, result[0], result[1]);
             return 0;
