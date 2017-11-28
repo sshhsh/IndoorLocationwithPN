@@ -199,12 +199,12 @@ public class WavePainter extends SurfaceView implements SurfaceHolder.Callback {
 
         yMin -= 10;
         yMax += 10;
-        slopeX = (float) width / dataLength;
+        slopeX = (float) (width - 1) / (float) (dataLength - 1);
         float slopeY = height / (yMax - yMin);
         mCanvas.drawLine(maxIndex * slopeX, 0, maxIndex * slopeX, height, paintLine2);
         Path path = new Path();
         path.moveTo(0, height - (waveData[0] - yMin) * slopeY);
-        for (int i = 1; i < dataLength - 1; ++i) {
+        for (int i = 1; i <= dataLength - 1; ++i) {
             path.lineTo(i * slopeX, height - (waveData[i] - yMin) * slopeY);
         }
         path.setLastPoint((dataLength - 1) * slopeX, height - (waveData[dataLength - 1] - yMin) * slopeY);
