@@ -13,7 +13,7 @@ import java.util.Queue;
  * find signal positions in time line
  */
 
-public class CorrelationAnalyzer {
+class CorrelationAnalyzer {
     static final private int window = 48000 / 1000 * 5; //window width for multi path analyze
     static final private double rate = 2.5; //rate between largest correlation and the smallest accessible one
     static final private int gap = 48000 / 1000 * 200; //minimum gap between two signals is 200ms
@@ -65,7 +65,7 @@ public class CorrelationAnalyzer {
      * @param correlationData correlation data
      * @return time when signal occurs
      */
-    public int[] cal(double[] correlationData) {
+    int[] cal(double[] correlationData) {
         int count = 0;
         int iMax = findMax(correlationData, 0, correlationData.length);
         DataArea d = new DataArea(0, correlationData.length, iMax, correlationData[iMax]);

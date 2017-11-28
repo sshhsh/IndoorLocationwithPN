@@ -5,7 +5,7 @@ package com.example.zhucebiao.indoorlocationwithpn;
  * Calculate the location base on distance differences
  */
 
-public class LocationCalculator {
+class LocationCalculator {
     private double[] nodeX;
     private double[] nodeY;
     private double[] dd;
@@ -19,7 +19,7 @@ public class LocationCalculator {
      *
      * @param speakNum number of speakers
      */
-    public LocationCalculator(int speakNum) {
+    LocationCalculator(int speakNum) {
         nodeX = new double[speakNum];
         nodeY = new double[speakNum];
 
@@ -29,7 +29,7 @@ public class LocationCalculator {
         result = new double[2];
     }
 
-    public void updatePosition(double[] x, double[] y) {
+    void updatePosition(double[] x, double[] y) {
         if (x.length != nodeX.length) return;
         for (int i = 0; i < x.length; ++i) {
             nodeX[i] = x[i];
@@ -37,7 +37,7 @@ public class LocationCalculator {
         }
     }
 
-    public double[] cal(double[] dd) {
+    double[] cal(double[] dd) {
         this.dd = dd;
         calLocation();
         return result;
