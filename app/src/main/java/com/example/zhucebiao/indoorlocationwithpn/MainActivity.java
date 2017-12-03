@@ -2,10 +2,12 @@ package com.example.zhucebiao.indoorlocationwithpn;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -20,6 +22,8 @@ import android.widget.ProgressBar;
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -53,6 +57,13 @@ public class MainActivity extends AppCompatActivity {
     private EditText textX1, textX2, textX3, textY1, textY2, textY3;
     private ProgressBar progressBar;
 
+    /**
+     * variables for file saving
+     */
+    private Button buttonSave;
+    private File cacheDir;
+    private File file;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         painterWave2 = findViewById(R.id.waveView2);
         painterWave3 = findViewById(R.id.waveView3);
         buttonStart = findViewById(R.id.buttonStart);
+        buttonSave = findViewById(R.id.buttonSave);
         textX1 = findViewById(R.id.x1);
         textX2 = findViewById(R.id.x2);
         textX3 = findViewById(R.id.x3);
@@ -77,6 +89,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 new CalculationTask().execute();
+            }
+        });
+        buttonSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Create the text message with a string
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+                sendIntent.setType("text/plain");
+
+                // Verify that the intent will resolve to an activity
+                if (sendIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(sendIntent);
+                }
             }
         });
 
@@ -91,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         dd = new double[2];
         getPnDataFromRes();
 
+        cacheDir = this.getFilesDir();
         new RemoteTime().execute(REMOTE_URL);
         buttonStart.setEnabled(true);
     }
@@ -214,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
             publishProgress(0);
             record.stop();
             correlationData = correlation.getResult(rawSound, pnData);
+            saveDoubleData(correlationData);
             resultIndex = analyzer.cal(correlationData);
             publishProgress(2);
 
@@ -228,12 +257,38 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             buttonStart.setEnabled(false);
+            buttonSave.setEnabled(false);
         }
 
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
             buttonStart.setEnabled(true);
+            buttonSave.setEnabled(true);
+        }
+    }
+
+    private void saveDoubleData(double[] data) {
+        file = new File(cacheDir, "temp.csv");
+        if (file.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            file.delete();
+        } else {
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            @SuppressWarnings("deprecation") @SuppressLint("WorldReadableFiles") FileOutputStream out = openFileOutput("temp.csv", MODE_WORLD_READABLE);
+            for (double aData : data) {
+                out.write((String.valueOf(aData) + '\n').getBytes("ASCII"));
+            }
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
