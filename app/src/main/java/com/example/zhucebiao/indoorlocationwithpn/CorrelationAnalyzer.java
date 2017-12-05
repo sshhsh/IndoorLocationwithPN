@@ -14,7 +14,7 @@ import java.util.Queue;
  */
 
 class CorrelationAnalyzer {
-    static final private int window = 48000 / 1000 * 5; //window width for multi path analyze
+    static final private int window = 48000 / 1000 * 25; //window width for multi path analyze
     static final private double rate = 2.5; //rate between largest correlation and the smallest accessible one
     static final private int gap = 48000 / 1000 * 200; //minimum gap between two signals is 200ms
 
@@ -122,7 +122,7 @@ class CorrelationAnalyzer {
      * @return the index of first peak among data
      */
     private int findFirstPeak(double[] data, int startIndex, int endIndex, double accessibleValue) {
-        int index = -1;
+        int index = endIndex;
         for (int i = startIndex; i < endIndex; ++i) {
             if (data[i] > accessibleValue) {
                 for (int j = i + 1; j < endIndex; ++j) {

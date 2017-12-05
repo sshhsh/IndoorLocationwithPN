@@ -1,5 +1,7 @@
 package com.example.zhucebiao.indoorlocationwithpn;
 
+import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
+import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import org.jtransforms.fft.DoubleFFT_1D;
 
 class CrossCorrelation {
@@ -7,6 +9,8 @@ class CrossCorrelation {
     private double b[];
     private double c[];
     private double r[];
+    private int x[];
+    private double y[];
     private int len;
     private DoubleFFT_1D fft;
 
@@ -23,6 +27,8 @@ class CrossCorrelation {
         b = new double[len * 2];
         c = new double[len * 2];
         r = new double[len];
+        x = new int[len];
+        y = new double[len];
     }
 
     /**
@@ -54,8 +60,9 @@ class CrossCorrelation {
         }
         fft.complexInverse(c, false);
         for (int i = 0; i < len; ++i) {
-            r[i] = c[2 * i] * c[2 * i] + c[2 * i + 1] * c[2 * i + 1];
+            r[i] = c[2 * i] * c[2 * i]/* + c[2 * i + 1] * c[2 * i + 1]*/;
         }
+        envelop();
         return r;
     }
 
@@ -77,6 +84,37 @@ class CrossCorrelation {
         for (int i = 2 * (len - t1); i < 2 * len; ++i) {
             a[2 * t1] = 0;
             a[2 * t1 + 1] = 0;
+        }
+    }
+
+    private SplineInterpolator splineInterpolator = new SplineInterpolator();
+
+    private void envelop() {
+        boolean flag = false;
+        int count = 0;
+        for (int i = 1; i < len; ++i) {
+            if (flag) {
+                if (r[i - 1] < r[i]) {
+                    flag = false;
+                }
+                continue;
+            }
+            if (r[i - 1] > r[i]) {
+                x[count] = i - 1;
+                y[count] = r[i - 1];
+                flag = true;
+                count++;
+            }
+        }
+        double[] tmpx = new double[count];
+        double[] tmpy = new double[count];
+        for (int i = 0; i < count; i++) {
+            tmpx[i] = x[i];
+            tmpy[i] = y[i];
+        }
+        PolynomialSplineFunction function = splineInterpolator.interpolate(tmpx, tmpy);
+        for (int i = x[0]; i < x[count - 1]; ++i) {
+            r[i] = function.value(i);
         }
     }
 }
