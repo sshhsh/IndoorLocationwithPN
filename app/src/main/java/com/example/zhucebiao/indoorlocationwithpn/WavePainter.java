@@ -1,5 +1,6 @@
 package com.example.zhucebiao.indoorlocationwithpn;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -154,6 +155,7 @@ public class WavePainter extends SurfaceView implements SurfaceHolder.Callback {
         mHolder.unlockCanvasAndPost(mCanvas);
     }
 
+    @SuppressLint("DefaultLocale")
     private void updateWaveData(int indexOffset) {
         if (rawWaveData == null) return;
         if (indexOffset == 0) sumOffset = 0;
@@ -188,7 +190,8 @@ public class WavePainter extends SurfaceView implements SurfaceHolder.Callback {
 
         maxIndex = this.rawIndex - index_start;
         dataLength = index_end - index_start;
-        time = Double.toString((double) this.rawIndex / 48000);
+        //time = Double.toString((double) this.rawIndex / 48000);
+        time = String.format("%.5f  %.5e", (double) this.rawIndex / 48000, yMax);
     }
 
     private void drawWave() {

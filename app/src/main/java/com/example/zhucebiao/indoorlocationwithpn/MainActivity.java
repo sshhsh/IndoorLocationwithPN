@@ -27,11 +27,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     static final int RATE_HZ = 48000;
     static final int BUFFER_SIZE = RATE_HZ;
-    static final String REMOTE_URL = "192.168.1.100";
+    static final String REMOTE_URL = "202.120.2.101";
 
     private AudioRecord record;
     private long remoteTimeOffset = 0;
@@ -63,6 +69,12 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonSave;
     private File cacheDir;
     private File file;
+
+    /**
+     * variables for OkHttp
+     */
+    OkHttpClient httpclient;
+    URL url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +129,12 @@ public class MainActivity extends AppCompatActivity {
         y = new double[3];
         dd = new double[2];
         getPnDataFromRes();
+        httpclient = new OkHttpClient();
+        try {
+            url = new URL("http", "kiddd.science", 30001, "");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
 
         cacheDir = this.getFilesDir();
         new RemoteTime().execute(REMOTE_URL);
@@ -227,9 +245,17 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Integer doInBackground(Integer... integers) {
-            long timeNow = System.currentTimeMillis() % 1000;
+            long occurTime = 0;
             try {
-                Thread.sleep((2000 - timeNow - remoteTimeOffset % 1000) % 1000);
+                occurTime = getSoundTime();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            long timeWait = occurTime - System.currentTimeMillis() - remoteTimeOffset;
+            if (timeWait - 100 < 0)
+                return -1;
+            try {
+                Thread.sleep(timeWait - 100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 return -1;
@@ -290,5 +316,17 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private long getSoundTime() throws IOException {
+        long res;
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        Response response = httpclient.newCall(request).execute();
+        //noinspection ConstantConditions
+        res = Long.valueOf(response.body().string());
+        return res;
     }
 }
